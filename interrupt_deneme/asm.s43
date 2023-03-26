@@ -1,0 +1,37 @@
+#include "msp430.h"                     ; #define controlled include file
+#include "msp430x11x1.h"
+#include "msp430g2553.h"
+
+;-----------------------------------------------------------------------
+; Pins for LED on port 2
+LED1 EQU BIT3
+LED2 EQU BIT4
+;-----------------------------------------------------------------------
+RSEG CSTACK ; Create stack (in RAM)
+;-----------------------------------------------------------------------
+RSEG    CODE ; Program goes in code memory
+Reset:       ; Execution starts here
+mov.w #SFE(CSTACK),SP ; Initialize stack pointer
+main:        ; Equivalent to start of main() in C
+mov.w #WDTPW|WDTHOLD ,& WDTCTL ; Stop watchdog timer
+mov.b #LED2 ,& P2OUT ; Preload LED1 on , LED2 off
+bis.b #LED1|LED2 ,& P2DIR ; Set pins with LED1 ,2 to output
+mov.w #49999 ,& TACCR0 ; Period for up mode
+mov.w #CCIE ,& TACCTL0 ; Enable interrupts on Compare 0
+mov.w #MC_1|ID_3|TASSEL_2|TACLR ,& TACTL ; Set up Timer A
+; Up mode , divide clock by 8, clock from SMCLK , clear TAR
+bis.w #GIE ,SR ; Enable interrupts (just TACCR0)
+jmp $ ; Loop forever; interrupts do all
+;-----------------------------------------------------------------------
+; Interrupt service routine for TACCR0 , called when TAR = TACCR0
+; No need to acknowledge interrupt explicitly - done automatically
+TA0_ISR: ; ISR for TACCR0 CCIFG
+xor.b #LED1|LED2 ,& P2OUT ; Toggle LEDs
+reti ; That's all: return from interrupt
+;-----------------------------------------------------------------------
+COMMON INTVEC ; Segment for vectors (in Flash)
+ORG    TIMERA0_VECTOR
+DW TA0_ISR ; ISR for TA0 interrupt
+ORG     RESET_VECTOR
+DW Reset ; Address to start execution
+END

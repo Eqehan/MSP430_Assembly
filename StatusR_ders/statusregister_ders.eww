@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\..\addressing_modes\addressing_modes.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\..\Sirayla_Rakam_Yazma\sirayla_rakam_yazma.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\statusregister_ders.ewp</path>
+  </project>
+  <batchBuild/>
+</workspace>
+
+
